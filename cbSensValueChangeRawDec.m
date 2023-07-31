@@ -6,7 +6,7 @@
 %     want to be able to replot raw, clean, and decimated plots.
 %%% ==============================================================================
 
-function cbSensValueChangeRaw(~, src, Dec, Clean, Raw, Rawdec, CleanCb, DecCb, RawCb, RawDecCb)
+function cbSensValueChangeRawDec(~, src, Dec, Clean, Raw, Rawdec, CleanCb, DecCb, RawCb, RawDecCb)
             if src.Value == 0               % if checkbox is unchecked
                 Dec.Visible = 'off';
                 Clean.Visible = 'off';
@@ -14,8 +14,7 @@ function cbSensValueChangeRaw(~, src, Dec, Clean, Raw, Rawdec, CleanCb, DecCb, R
                 Rawdec.Visible = 'off';
             else
 
-                Raw.Visible = 'on';
-
+                Rawdec.Visible = 'on';
 
             end
             
