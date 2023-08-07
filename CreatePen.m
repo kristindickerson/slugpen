@@ -36,7 +36,7 @@ function [HeatPulsePens,...
         HeatPulsePens = [HeatPulsePens PulseData];
  
         %% Define number of sensors
-        NumThermTotal=NoTherm+1;
+        NumThermTotal=NoTherm;
 
         %% Ask user if they want to use raw, raw decimated, filtered, or
         %% filtered decimate data to create the .pen file
