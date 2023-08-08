@@ -117,17 +117,8 @@ function [HeatPulsePens,...
             BottomWaterStart_time   = datetime(H.Selections.Start_Eqm.Value); % START of bottom water CALIRBATION period
             BottomWaterEnd_time     = datetime(H.Selections.End_Eqm.Value); % END of bottom water CALIBRATION period
 
-        %% Fix missing data to be -999
-            % Depth
-            Depth_mean(Depth_mean==0)=-999;
-
-            % Tilt
-            Tilt_mean(Tilt_mean==0)=-999;
-        
-            % Heat Pulse
-            if isempty(HeatPulseRecord_time)
-                HeatPulseRecord = '-999';
-            end
+            %% Define heat pulse record if no heat pulse
+            HeatPulseRecord(isempty(HeatPulseRecord_time))='-999';
 
              %% Penfile Records
                 % Variables for indexing, all decimated or regular time
@@ -307,7 +298,7 @@ function [HeatPulsePens,...
             cd ..
 
             %% Tell user if no calibration period was selected
-            uialert(figure_Main, ['No calibration period was selected ' newline ...
+            uialert(figure_Main, ['\bf No calibration period was selected ' newline newline ...
                'Temperature sensors will not be calibrated unless a ' ...
                'calibration period is chosen or mean calibration ' ...
                'temperatures for each sensor are manually input in ' ...
