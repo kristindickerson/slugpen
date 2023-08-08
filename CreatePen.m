@@ -127,7 +127,7 @@ function [HeatPulsePens,...
                 % intervals, depending which was selected by user
                 
                 % Records for calibrationa and penetration
-                CalRecords = record(Time>=BottomWaterStart_time & Time<=BottomWaterEnd_time); % records from start of calibration to end of calibration
+
                 PenetrationRecords = record(Time>=PenetrationRecord_time & Time<=EndRecord_time); % records of penetration
 
                 % Records for bottom water temps before penetration
