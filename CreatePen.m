@@ -117,10 +117,21 @@ function [HeatPulsePens,...
             BottomWaterStart_time   = datetime(H.Selections.Start_Eqm.Value); % START of bottom water CALIRBATION period
             BottomWaterEnd_time     = datetime(H.Selections.End_Eqm.Value); % END of bottom water CALIBRATION period
 
-            % Variable HeatPulseRecord will be empty if there is no heat pulse. Set to
-            % zero
+        %% Fix missing data to be -999
+            
+            % Depth
+            if Depth_mean==0
+                Depth_mean=-999;
+            end
+
+            % Tilt
+            if Tilt_mean==0
+                Tilt_mean=-999;
+            end
+        
+            % Heat Pulse
             if isempty(HeatPulseRecord_time)
-                HeatPulseRecord = '0';
+                HeatPulseRecord = '-999';
             end
 
              %% Penfile Records
@@ -215,7 +226,7 @@ function [HeatPulsePens,...
                 % Header
                 hdrstr1 = [StationName,' ',Penetration,' ','''', Cruisename,'''', ' ',Datum,];
                 fprintf(fido,'%s\n',hdrstr1);
-                fprintf(fido,'%6.6f %6.6f %6.0f %6.2f\n', str2num(Latitude), str2num(Longitude), str2num(Depth_mean), str2num(Tilt_mean));
+                fprintf(fido,'%6.6f %6.6f %6.0f %6.2f\n', str2double(Latitude), str2double(Longitude), str2double(Depth_mean), str2double(Tilt_mean));
                 hdrstr3 = [LoggerID,'  ',ProbeID,'  ',num2str(NoActiveTherm), '  ', PenPulsePower];
                 fprintf(fido,'%s\n',hdrstr3);
                 fprintf(fido,'%6.0f\n',PenetrationRecord_sequential);
@@ -298,6 +309,14 @@ function [HeatPulsePens,...
                  copyfile(char(filenames(i)),'../../slugheat/inputs')
             end
             cd ..
+
+            %% Tell user if no calibration period was selected
+            uialert(figure_Main, ['No calibration period was selected ' newline ...
+               'Temperature sensors will not be calibrated unless a ' ...
+               'calibration period is chosen or mean calibration ' ...
+               'temperatures for each sensor are manually input in ' ...
+               '.pen file or .mat file by user'], ...
+               'WARNING', 'Icon','warning')
 
             %% Tell user where the outputs are saved
             uialert(figure_Main, ['Output files created for penetration: ' newline ...
