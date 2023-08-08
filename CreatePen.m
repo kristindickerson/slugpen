@@ -118,16 +118,11 @@ function [HeatPulsePens,...
             BottomWaterEnd_time     = datetime(H.Selections.End_Eqm.Value); % END of bottom water CALIBRATION period
 
         %% Fix missing data to be -999
-            
             % Depth
-            if Depth_mean==0
-                Depth_mean=-999;
-            end
+            Depth_mean(Depth_mean==0)=-999;
 
             % Tilt
-            if Tilt_mean==0
-                Tilt_mean=-999;
-            end
+            Tilt_mean(Tilt_mean==0)=-999;
         
             % Heat Pulse
             if isempty(HeatPulseRecord_time)
@@ -239,6 +234,7 @@ function [HeatPulsePens,...
 
                 % Mean calibration temp data
                 MeanCalTemps = mean(CalTemps, 1, 'omitnan');
+                MeanCalTemps(isnan(MeanCalTemps))=-999;
                 fprintf(fido,FmtBW, '  ', MeanCalTemps); 
                 
                 % Output Format for Thermistor Data
