@@ -170,10 +170,12 @@ function [HeatPulsePens,...
                 PenetrationRecord = record(a(1));
     
                 % Find closest record to heat pulse time (if there was a pulse)
-                if ~isempty(HeatPulseRecord_time)
+                if ~isnat(HeatPulseRecord_time)
                     foo = abs(HeatPulseRecord_time-Time);
                     a   = find(foo==min(foo));
                     HeatPulseRecord = record(a(1));
+                else 
+                    HeatPulseRecord=nan;
                 end
 
 
@@ -188,7 +190,7 @@ function [HeatPulsePens,...
 
                 % Set HeatPulseRecord_sequential to zero if no heat pulse
                 if isempty(HeatPulseRecord_sequential)
-                    HeatPulseRecord_sequential = 0;
+                    HeatPulseRecord_sequential = -999;
                 end
     
                 % Get penetration number
