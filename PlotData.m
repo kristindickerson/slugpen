@@ -7,7 +7,7 @@
 %      07/18/2023 - Kristin Dickerson, UCSC
 %%% =======================================================================
 
-function [Checkboxes]...
+function [Checkboxes,TempPlots, BadSensors]...
             = PlotData(figure_Main, ...
              H, ...
              DATA, ...
@@ -37,6 +37,13 @@ function [Checkboxes]...
             T      = DATA.Traw;
             Time   = DATA.Time;
 
+
+            %% Round
+             round(T_cln,3);
+             round(T_dec,3);
+             round(T,3);
+             round(T_decRaw,3);
+
             % Enable buttons and fill in text
             H.Selections.Select.Enable='on';
             H.Exe_Controls.Delete.Enable='on';
@@ -47,21 +54,9 @@ function [Checkboxes]...
             CMap = flipud(CMap);
             CMap = interp1(1:256,CMap,1:256/(NoTherm-1):256); % 'jet' colormap for Matlab version 2019a and later has size 256x3 RBG matrix
             colormap(H.Axes.Raw, CMap);
-
-        %% Check for NaN (-999) data (aka no data recorded) that will mess up plot
-        if any(any(T==-999))
-            hidedata = uiconfirm(figure_Main, ['One of more sensor recorded ' ...
-                'no data (T = -999) in this .raw file. Would you like to ' ...
-                'hide this data form the plot?'], 'NaN Data Recorded', ...
-                'Options',{'Hide NaN (T = -999) data', 'Plot NaN (T = -999) data'});
-            switch hidedata
-                case 'Hide NaN (T = -999) data'
-                    T_decRaw(T_decRaw==-999)=NaN;
-                    T(T==-999)=NaN;
-                case 'Plot NaN (T = -999) data'
-                    return
-            end
-        end 
+            
+            % Sensors to ignore
+            BadSensors=[];
 
 
       %% Plot FILTERED DECIMATED (median filtered) TEMPERATURE/OHM DATA AS o's
@@ -180,7 +175,6 @@ function [Checkboxes]...
             % Plot DECIMATED Bottom Water
             h_axRawDec(i) = plot(H.Axes.Raw, Time_dec,T_decRaw(NoTherm,:),'k-x','markersize',4);
 
-
             % Save plot handles
             H.Plot_Controls.RawDecimatedPlot.UserData = h_axRawDec;
 
@@ -235,11 +229,6 @@ function [Checkboxes]...
             H.Axes.Depth.XLim=tempAx.XLim;
             H.Axes.Accel.XLim=tempAx.XLim;
             H.Axes.Tilt.XLim=tempAx.XLim;
-            
-           % xticks(tempAx,t_start:minutes(5):t_end);
-           % xticks(accelAx,t_start:minutes(5):t_end);
-           % xticks(depthAx,t_start:minutes(5):t_end);
-           % xticks(tiltAx,t_start:minutes(5):t_end);
 
             tempAx.XAxis.TickLabelFormat='HH:mm:ss';
             accelAx.XAxis.TickLabelFormat='HH:mm:ss';
@@ -267,7 +256,7 @@ function [Checkboxes]...
 
             H.Axis_Limits.AxLims_Raw_Y=tempAx.YLim;
 
-        
+    
 
     %% Update loading box
             loading.Message = 'Finishing...';
@@ -320,8 +309,44 @@ function [Checkboxes]...
                               H.PlotCheckboxes.Filtered_check.Value, H.PlotCheckboxes.Filtereddec_check.Value, H.PlotCheckboxes.Raw_check.Value, ...
                               H.PlotCheckboxes.Rawdec_check.Value});
                   end
-   
-    %% Update loading box and close
+     
+     %% Save plots in a structure
+        TempPlots = struct('FilteredDecimated',h_axDec, ...
+            'Filtered', h_axCln, 'RawDecimated', h_axRawDec,...
+            'Raw',h_axRaw);
+
+
+     %% Hide plots and checkboxes for bad (NaN) data
+        % Format compatibility
+        T_cln(isnan(T_cln))=-999;
+        T_dec(isnan(T_dec))=-999;
+        T(isnan(T))=-999;
+        T_decRaw(isnan(T_decRaw))=-999;
+
+        if any(all(T==-999,2))
+            hidedata = uiconfirm(figure_Main, ['One of more sensor recorded ' ...
+                'no data (T = -999) in this .raw file. Would you like to ' ...
+                'hide this data form the plot?'], 'NaN Data Recorded', ...
+                'Options',{'Hide NaN (T = -999) data', 'Plot NaN (T = -999) data'});
+            switch hidedata
+                case 'Hide NaN (T = -999) data'
+                    BadSensors = find(all(T==-999,2));
+                    for i=1:length(BadSensors)
+                       Checkboxes{BadSensors(i)}.Visible='off'; 
+                       h_axDec(BadSensors(i)).Visible='off';
+                       h_axCln(BadSensors(i)).Visible='off';
+                       h_axRaw(BadSensors(i)).Visible='off';
+                       h_axRawDec(BadSensors(i)).Visible='off';
+                    end
+                    tempAx.YLim = [min(min(T(T>0)))-1,max(max(T(T>0))+1)];
+                case 'Plot NaN (T = -999) data'
+                    return
+            end
+        end 
+
+    
+                  
+      %% Update loading box and close
         loading.Value =1;
         close(loading)
 

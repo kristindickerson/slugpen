@@ -2,7 +2,6 @@
 %%  Purpose
 %     This function creates datatimes for data loaded into SlugPen as well 
 %     as takes only unique times for further processing
-%
 %%   Last edit
 %      07/19/2023 - Kristin Dickerson, UCSC
 %%% =======================================================================
@@ -47,3 +46,4 @@ function [timeNum, datauniquetimes] ...
         datauniquetimes = struct('TIMENUMU', timeNumU, 'ACCxU', accxU, ...
             'ACCyU', accyU, 'ACCzU', acczU, 'PWRU', pwrU, 'TILTU',...
             tiltU, 'GU',gU, 'ZU',zU, 'TRAWU',TrawU);
+
